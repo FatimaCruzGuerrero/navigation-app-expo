@@ -1,24 +1,28 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import "./global.css"
+import { Slot, SplashScreen } from 'expo-router'
+import { useFonts } from 'expo-font'
+import { useEffect } from "react";
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+SplashScreen.preventAutoHideAsync();
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+const RootLayout = () => {
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+    const [fontsLoaded, error] = useFonts ({
+        'WorkSans-Black': require('../assets/fonts/WorkSans-Black.ttf'),
+        'WorkSans-Light': require('../assets/fonts/WorkSans-Light.ttf'),
+        'WorkSans-Medium': require('../assets/fonts/WorkSans-Medium.ttf')
+    })
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+    useEffect(() => {
+        if(error) throw error;
+        if(fontsLoaded) SplashScreen.hideAsync();
+    }, [fontsLoaded, error])
+
+    if(!fontsLoaded && !error) return null;
+
+    return (
+        <Slot/>
+    )
 }
+
+export default RootLayout
